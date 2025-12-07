@@ -21,6 +21,9 @@ classdef PreProcessor
 
             issues = obj.preProcessCreationDate(issues);
             issues = obj.preProcessProjectCode(issues);
+            issues = obj.preProcessDate(issues);
+            
+            issues = sortrows(issues, "issue_created", "ascend");
 
             obj.savePreprocessed(issues)
         end
@@ -55,6 +58,14 @@ classdef PreProcessor
             issues.issue_created = extractBetween(issues.issue_created, 1, 19);
             issues.issue_created = datetime(issues.issue_created, ...
                 "InputFormat", "yyyy-MM-dd HH:mm:ss");
+        end
+
+        function issues = preProcessDate(~, issues)
+            issues.year = year(issues.issue_created);
+            issues.month = month(issues.issue_created);
+            issues.week_of_month = ceil(day(issues.issue_created) / 7);
+            issues.week_of_year = week(issues.issue_created);
+            issues.quarter = quarter(issues.issue_created);
         end
 
         function savePreprocessed(obj, issues)
