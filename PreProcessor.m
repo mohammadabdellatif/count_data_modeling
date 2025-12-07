@@ -17,12 +17,12 @@ classdef PreProcessor
         function preprocess(obj, datasetUrl)
             issuesDataSet = obj.openDataset(datasetUrl);
             fprintf("dataset downloaded: %d %n", size(issuesDataSet))
-            issues = issuesDataSet(:, ["issue_proj", "issue_created"]); % Assuming 'issue_created' is in the second column
-            issues.issue_created = datetime(issues.issue_created, ...
-                "InputFormat", "yyyy-MM-dd HH:mm:ssXXX", ...
-                "TimeZone", "UTC");
-            
-            issues = issues(char(strlength(issues.issue_proj) > 6), :);
+            issues = issuesDataSet(:, ["id", "issue_proj", "issue_created"]);
+
+            issues = obj.preProcessCreationDate(issues);
+            issues = obj.preProcessProjectCode(issues);
+
+            obj.savePreprocessed(issues)
         end
     end
 
@@ -41,6 +41,28 @@ classdef PreProcessor
             end
            
             issuesDataset = readtable(filename);
+        end
+
+        function issues = preProcessProjectCode(~, issues)
+            issues.issue_proj = string(issues.issue_proj);
+            issues = issues(strlength(issues.issue_proj) > 6, :);
+            issues.country = extractBetween(issues.issue_proj, 1, 3);
+            issues.product = extractBetween(issues.issue_proj, 4, 5);
+            issues.client_id = extractAfter(issues.issue_proj, 5);
+        end
+
+        function issues = preProcessCreationDate(~, issues)
+            issues.issue_created = extractBetween(issues.issue_created, 1, 19);
+            issues.issue_created = datetime(issues.issue_created, ...
+                "InputFormat", "yyyy-MM-dd HH:mm:ss");
+        end
+
+        function savePreprocessed(obj, issues)
+            outputFilename = fullfile(obj.tempDir, "processed_issues.csv");
+            writetable(issues, outputFilename);
+            fprintf("Processed %n issues and saved to: %s\n", ...
+                size(issues), ...
+                outputFilename);
         end
     end
 end
