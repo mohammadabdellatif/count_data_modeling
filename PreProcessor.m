@@ -14,7 +14,7 @@ classdef PreProcessor
             end
         end
 
-        function preprocess(obj, datasetUrl)
+        function preProcesedData = preprocess(obj, datasetUrl)
             issuesDataSet = obj.openDataset(datasetUrl);
             fprintf("dataset downloaded: %d %n", size(issuesDataSet))
             issues = issuesDataSet(:, ["id", "issue_proj", "issue_created"]);
@@ -24,8 +24,9 @@ classdef PreProcessor
             issues = obj.preProcessDate(issues);
             
             issues = sortrows(issues, "issue_created", "ascend");
+            issues = issues(issues.year < 2023, :);
 
-            obj.savePreprocessed(issues)
+            preProcesedData = obj.savePreprocessed(issues);
         end
     end
 
@@ -55,6 +56,7 @@ classdef PreProcessor
         end
 
         function issues = preProcessCreationDate(~, issues)
+            % Extract without the timezone
             issues.issue_created = extractBetween(issues.issue_created, 1, 19);
             issues.issue_created = datetime(issues.issue_created, ...
                 "InputFormat", "yyyy-MM-dd HH:mm:ss");
@@ -63,12 +65,14 @@ classdef PreProcessor
         function issues = preProcessDate(~, issues)
             issues.year = year(issues.issue_created);
             issues.month = month(issues.issue_created);
+            issues.day_of_month = day(issues.issue_created);
+            issues.day_of_week = upper(day(issues.issue_created, 'shortname'));
             issues.week_of_month = ceil(day(issues.issue_created) / 7);
             issues.week_of_year = week(issues.issue_created);
             issues.quarter = quarter(issues.issue_created);
         end
 
-        function savePreprocessed(obj, issues)
+        function outputFilename = savePreprocessed(obj, issues)
             outputFilename = fullfile(obj.tempDir, "processed_issues.csv");
             writetable(issues, outputFilename);
             fprintf("Processed %n issues and saved to: %s\n", ...
