@@ -3,9 +3,6 @@ dataUrl = "https://data.mendeley.com/public-files/datasets/btm76zndnt/files/2018
 preProcessor = PreProcessor(currentSWD + "/temp");
 proProcessedDataset = preProcessor.preprocess(dataUrl);
 
-eda = EDA('temp\processed_issues.csv');
 
-
-eda.anovaTestForIssuesCountPerDay();
 
 

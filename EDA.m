@@ -240,24 +240,25 @@ classdef EDA
             title('Daily Record Count Distribution By Day of Week')
         end
 
-        function anovaTestForIssuesCountPerDay(obj)
-            disp('============All week days================')
+        function tests = anovaTestForIssuesCountPerDay(obj)
+            tests = {};
             lastTwoYears = obj.issues(obj.issues.year >= max(obj.issues.year) - 2,:);
-            grpByYearAndDayOfWeek = groupsummary(lastTwoYears, {'year', 'day_of_week'});
-            grpByYearAndDayOfWeek.day_of_week = categorical(grpByYearAndDayOfWeek.day_of_week);
-            % disp(anova(grpByYearAndDayOfWeek(:,'day_of_week'),grpByYearAndDayOfWeek.GroupCount))
-            anova1(grpByYearAndDayOfWeek.GroupCount, grpByYearAndDayOfWeek.day_of_week);
+            [p, tbl, stats] = obj.performAnova(lastTwoYears,'day_of_week', ["SUN","MON","TUE","WED","THU","FRI","SAT"]);
+            tests{end+1} = {'All Days',p, tbl, stats};
 
-            disp('============Without weekends================')
             withoutWeekEnds = lastTwoYears(~ismember(lastTwoYears.day_of_week,{'FRI','SAT'}) ,:);
-            grpByYearAndDayOfWeek = groupsummary(withoutWeekEnds, {'year', 'day_of_week'});
-            anova1(grpByYearAndDayOfWeek.GroupCount, grpByYearAndDayOfWeek.day_of_week);
-            % 
-            % disp('============Weekends================')
-            % weekEnds = lastTwoYears(ismember(lastTwoYears.day_of_week,{'FRI','SAT'}) ,:);
-            % grpByYearAndDayOfWeek = groupsummary(weekEnds, {'year', 'day_of_week'});
-            % disp(anova(grpByYearAndDayOfWeek(:,'day_of_week'),grpByYearAndDayOfWeek.GroupCount))
+            [p, tbl, stats] = obj.performAnova(withoutWeekEnds,'day_of_week', ["SUN","MON","TUE","WED","THU"]);
+            tests{end+1} = {'Middle of the Week', p, tbl, stats};
+
+            [p, tbl, stats] = obj.performAnova(lastTwoYears,'quarter', [1,2,3,4]);
+            tests{end+1} = {'Quarter of the Year', p, tbl, stats};
         end
 
+        function [p, tbl, stats] = performAnova(~, data, groupCol, colKeys)
+            grpByYearAndCol = groupsummary(data, {'year', groupCol});
+            grpByYearAndCol.(groupCol) = categorical(grpByYearAndCol.(groupCol), colKeys, 'Ordinal', true);
+            grpByYearAndCol = sortrows(grpByYearAndCol, groupCol);
+            [p, tbl, stats] =anova1(grpByYearAndCol.GroupCount, grpByYearAndCol.(groupCol), 'off');
+        end
     end
 end
