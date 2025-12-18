@@ -177,10 +177,9 @@ classdef EDA
             title('Daily Record Count Distribution By Year')
         end
 
-        function plotHistForLastTwoYears(obj)
+        function plotHistForYearsBack(obj, yearsBack)
             lastTwoYears = obj.issues( ...
-                (obj.issues.year >= max(obj.issues.year) - 2) & ...
-                (obj.issues.year ~= max(obj.issues.year)) &...
+                (obj.issues.year >= max(obj.issues.year) - yearsBack) & ...
                 (~ismember(obj.issues.day_of_week, {'FRI', 'SAT'})), :);
             G = groupsummary(lastTwoYears, ...
                 {'year', 'month', 'day_of_month'});
@@ -188,24 +187,26 @@ classdef EDA
             % Update the figure to stretch to fit the two subplots
             set(gcf, 'Position', [100, 100, 1200, 1000]); % Adjust figure size
             
+            x = ['Count per Days ', strjoin(unique(lastTwoYears.day_of_week), ', ')];
+            years = strjoin(string(unique(lastTwoYears.year)), ', ');
+            
             subplot(2, 1, 1); % Create a subplot for histfit
             histfit(G.GroupCount, 17);
-            xlabel('Count per Day');
+            xlabel(x);
             ylabel('Frequencies');
-            title('Daily Issues Frequencies');
+            title(['Daily Issues Frequencies ', years ]);
             
             subplot(2, 1, 2); % Create a subplot for normplot
             normplot(G.GroupCount);
-            xlabel('Count per Day');
+            xlabel(x);
             ylabel('Frequencies');
-            title('Normal Probability Plot');
-           
+            title(['Normal Probability Plot', years]);
         end
 
-        function plotBoxPlotForDaysForLastThreeYears(obj)
+        function plotBoxPlotForDaysForYearsBack(obj, yearsBack)
             G = obj.issues( ...
-                (obj.issues.year >= max(obj.issues.year) - 2), :);
-            G = groupsummary(obj.issues, ...
+                (obj.issues.year >= max(obj.issues.year) - yearsBack), :);
+            G = groupsummary(G, ...
                 {'year', 'week_of_year', 'day_of_week'});
             years = {'SUN';'MON';'TUE';'WED';'THU';'FRI';'SAT'};
             
@@ -240,9 +241,9 @@ classdef EDA
             title('Daily Record Count Distribution By Day of Week')
         end
 
-        function tests = anovaTestForIssuesCountPerDay(obj)
+        function tests = anovaTestForIssuesCountPerDay(obj, yearsBack)
             tests = {};
-            lastTwoYears = obj.issues(obj.issues.year >= max(obj.issues.year) - 2,:);
+            lastTwoYears = obj.issues(obj.issues.year >= max(obj.issues.year) - yearsBack,:);
             [p, tbl, stats] = obj.performAnova(lastTwoYears,'day_of_week', ["SUN","MON","TUE","WED","THU","FRI","SAT"]);
             tests{end+1} = {'All Days',p, tbl, stats};
 
