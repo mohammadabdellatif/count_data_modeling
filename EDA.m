@@ -240,26 +240,5 @@ classdef EDA
             ylabel('Records per Day of Weel');
             title('Daily Record Count Distribution By Day of Week')
         end
-
-        function tests = anovaTestForIssuesCountPerDay(obj, yearsBack)
-            tests = {};
-            lastTwoYears = obj.issues(obj.issues.year >= max(obj.issues.year) - yearsBack,:);
-            [p, tbl, stats] = obj.performAnova(lastTwoYears,'day_of_week', ["SUN","MON","TUE","WED","THU","FRI","SAT"]);
-            tests{end+1} = {'All Days',p, tbl, stats};
-
-            withoutWeekEnds = lastTwoYears(~ismember(lastTwoYears.day_of_week,{'FRI','SAT'}) ,:);
-            [p, tbl, stats] = obj.performAnova(withoutWeekEnds,'day_of_week', ["SUN","MON","TUE","WED","THU"]);
-            tests{end+1} = {'Middle of the Week', p, tbl, stats};
-
-            [p, tbl, stats] = obj.performAnova(lastTwoYears,'quarter', [1,2,3,4]);
-            tests{end+1} = {'Quarter of the Year', p, tbl, stats};
-        end
-
-        function [p, tbl, stats] = performAnova(~, data, groupCol, colKeys)
-            grpByYearAndCol = groupsummary(data, {'year', groupCol});
-            grpByYearAndCol.(groupCol) = categorical(grpByYearAndCol.(groupCol), colKeys, 'Ordinal', true);
-            grpByYearAndCol = sortrows(grpByYearAndCol, groupCol);
-            [p, tbl, stats] =anova1(grpByYearAndCol.GroupCount, grpByYearAndCol.(groupCol), 'off');
-        end
     end
 end

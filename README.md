@@ -13,8 +13,12 @@ published in Mendely. The dataset is described in the repository.
 - Download/clone the project into a directory.
 - Import the project into MATLAB, noting that that project was built using
 MATLAB R2025b
-- Run the pre_process.m file which will download the dataset from Mendeley
+- Run the run_pre_process.m file which will download the dataset from Mendeley
 and do the required preprocessing and preperation
-- Then run run_EDA.mlx and run_ANOVA.mlx to visualize the patterns and information
-in the dataset.
+- Then run any live script that starts with run_ for the exploratory Data
+Analysis.
+    - run_EDA.mlx: explore the helpdesk issues count patterns and inspect
+its relation with other features
+    - run_ANOVA.mlx: inspect the possible differences in issues count
+over different time period of the year.
 

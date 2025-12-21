@@ -70,6 +70,7 @@ classdef PreProcessor
             issues.week_of_month = ceil(day(issues.issue_created) / 7);
             issues.week_of_year = week(issues.issue_created);
             issues.quarter = quarter(issues.issue_created);
+            issues.quarter = strcat("Q", string(issues.quarter));
         end
 
         function outputFilename = savePreprocessed(obj, issues)
