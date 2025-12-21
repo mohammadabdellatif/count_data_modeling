@@ -1,3 +1,46 @@
 **.asv
 temp
 temp/**
+
+# =====================================
+# MATLAB temporary & autosave files
+# =====================================
+
+*.asv
+*.m~
+*.autosave
+*.tmp
+*.bak
+*.log
+
+# =====================================
+# MATLAB binary & generated data
+# =====================================
+
+*.mat          # Remove this line if .mat files are source data
+*.fig
+*.p
+
+# =====================================
+# Simulink generated files & caches
+# =====================================
+
+slprj/
+*.slxc
+*.slxp
+*.mdl.autosave
+*.mdl.r*
+*.slx.r*
+
+# =====================================
+# MATLAB Project internal metadata
+# (auto-generated – DO NOT COMMIT)
+# =====================================
+
+resources/project/
+
+# =====================================
+# Generated outputs (recommended)
+# ================
+
+
