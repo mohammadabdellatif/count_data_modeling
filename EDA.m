@@ -39,24 +39,24 @@ classdef EDA
                 ylim([padded(1), padded(2) + range(padded) * 0.1]); % Add 10% extra space to the top
             end
             
-            % Add linear fitting line
-            p = polyfit(issuesCount.year, issuesCount.GroupCount, 1); % Linear fit
-            yfit = polyval(p, issuesCount.year); % Evaluate the fit
-            plot(issuesCount.year, yfit, '--r', 'LineWidth', 1); % Plot the fit line
-            
-            % Calculate R-squared value
-            residuals = issuesCount.GroupCount - yfit; % Calculate residuals
-            ssRes = sum(residuals.^2); % Residual sum of squares
-            ssTot = sum((issuesCount.GroupCount - mean(issuesCount.GroupCount)).^2); % Total sum of squares
-            rSquared = 1 - (ssRes / ssTot); % R-squared calculation
-            % Add R-squared value to the plot
-            
-            text(issuesCount.year(2), max(issuesCount.GroupCount) * 0.9, ...
-                sprintf('R^2 = %.2f', rSquared), ...
-                'FontSize', 12, ...
-                'Color', 'k', ...
-                'HorizontalAlignment', 'center', ...
-                'BackgroundColor', 'w');
+            % % Add linear fitting line
+            % p = polyfit(issuesCount.year, issuesCount.GroupCount, 1); % Linear fit
+            % yfit = polyval(p, issuesCount.year); % Evaluate the fit
+            % plot(issuesCount.year, yfit, '--r', 'LineWidth', 1); % Plot the fit line
+            % 
+            % % Calculate R-squared value
+            % residuals = issuesCount.GroupCount - yfit; % Calculate residuals
+            % ssRes = sum(residuals.^2); % Residual sum of squares
+            % ssTot = sum((issuesCount.GroupCount - mean(issuesCount.GroupCount)).^2); % Total sum of squares
+            % rSquared = 1 - (ssRes / ssTot); % R-squared calculation
+            % % Add R-squared value to the plot
+            % 
+            % text(issuesCount.year(2), max(issuesCount.GroupCount) * 0.9, ...
+            %     sprintf('R^2 = %.2f', rSquared), ...
+            %     'FontSize', 12, ...
+            %     'Color', 'k', ...
+            %     'HorizontalAlignment', 'center', ...
+            %     'BackgroundColor', 'w');
 
             hold off; % Release the plot hold
 
@@ -119,15 +119,15 @@ classdef EDA
         end
 
         function plotIssuesCountByProductsCount(obj)
-            obj.scatterPlotTwoFieldsByYear('id','product');
+            obj.scatterPlotTwoFieldsByYear('product', 'id');
         end
 
         function plotIssuesCountByCountriesCount(obj)
-            obj.scatterPlotTwoFieldsByYear('id','country');
+            obj.scatterPlotTwoFieldsByYear('country','id');
         end
 
         function plotIssuesCountByClientCount(obj)
-            obj.scatterPlotTwoFieldsByYear('id','client_id');
+            obj.scatterPlotTwoFieldsByYear('client_id','id');
         end
 
         function stats = dailyStatisticalSummary(obj)
