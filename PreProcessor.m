@@ -14,9 +14,13 @@ classdef PreProcessor
             end
         end
 
-        function preProcesedData = preprocess(obj, datasetUrl)
+        function [preProcesedData, issues] = preprocess(obj, datasetUrl, holidays_ds)
             issuesDataSet = obj.openDataset(datasetUrl);
             fprintf("dataset downloaded: %d %n", size(issuesDataSet))
+            
+            holidaysDataSet = readtable(holidays_ds);
+            holidaysDataSet.Date = datetime(holidaysDataSet.Date, "InputFormat", "yyyy-MM-dd");
+
             issues = issuesDataSet(:, ["id", "issue_proj", "issue_created"]);
 
             issues = obj.preProcessCreationDate(issues);
@@ -24,9 +28,45 @@ classdef PreProcessor
             issues = obj.preProcessDate(issues);
             
             issues = sortrows(issues, "issue_created", "ascend");
-            issues = issues(issues.year < 2023, :);
+            issues.is_working_day = ~ismember(issues.day_of_week, ["FRI", "SAT"]);
+            issueDates = datetime(issues.year, issues.month, issues.day_of_month);
+            holidays = holidaysDataSet.Date;
+            issues.is_working_day(ismember(issueDates, holidays)) = false;
+            % issues = issues(issues.year < 2023, :);
 
             preProcesedData = obj.savePreprocessed(issues);
+        end
+
+        function dailySummaryOutput = preprocessDailySummary(obj, issues, holidays_ds)
+            dailySummary = groupsummary(issues, ...
+                {'year', 'month','day_of_month','day_of_week'});
+            dailySummary = sortrows(dailySummary, ...
+                {'year', 'month','day_of_month'});
+            years = unique(dailySummary.year);
+            holidaysDataSet = readtable(holidays_ds);
+            holidaysDataSet.Date = datetime(holidaysDataSet.Date, "InputFormat", "yyyy-MM-dd");
+
+            for i=1:length(years)
+                year = years(i);
+                for month = 1:12
+                    for date = 1:eomday(year, month)
+                        if ~any(dailySummary.year == year & ...
+                                dailySummary.month == month & ...
+                                dailySummary.day_of_month == date)
+                            % Calculate the weekday for the given year, month, and day
+                            weekDay = upper(day(datetime(year, month, date), 'shortname'));
+                            newRecord = table(year, month, date, weekDay, 0, ...
+                                'VariableNames', {'year', 'month', 'day_of_month', 'day_of_week', 'GroupCount'});
+                            dailySummary = [dailySummary; newRecord]; % Append the new record
+                        end
+                    end
+                end
+            end
+            dailySummary = sortrows(dailySummary, {'year', 'month', 'day_of_month'});
+            dailySummary.is_working_day = ~ismember(dailySummary.day_of_week, {'FRI','SAT'});
+            issueDates = datetime(dailySummary.year, dailySummary.month, dailySummary.day_of_month);
+            dailySummary.is_working_day(ismember(issueDates, holidaysDataSet.Date)) = false;
+            dailySummaryOutput = obj.saveDailySummary(dailySummary);
         end
     end
 
@@ -74,9 +114,17 @@ classdef PreProcessor
         end
 
         function outputFilename = savePreprocessed(obj, issues)
-            outputFilename = fullfile(obj.tempDir, "processed_issues.csv");
+            outputFilename = obj.saveDataset(issues, "processed_issues.csv");
+        end
+
+        function outputFilename = saveDailySummary(obj, dailySummary)
+            outputFilename = obj.saveDataset(dailySummary, "daily_summary.csv");
+        end
+
+        function outputFilename = saveDataset(obj, issues, fileName)
+            outputFilename = fullfile(obj.tempDir, fileName);
             writetable(issues, outputFilename);
-            fprintf("Processed %n issues and saved to: %s\n", ...
+            fprintf("Processed %n records and saved to: %s\n", ...
                 size(issues), ...
                 outputFilename);
         end
