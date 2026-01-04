@@ -121,10 +121,10 @@ classdef DailyEDA
             title('Daily Record Count Distribution By Day of Week');
         end
 
-        function plotTrendOfIssuesOverTime(obj, days, workingDayFlag)
+        function plotTrendOfIssuesOverTime(obj, days, workingDayFlag, yearsBack)
             % Count records by year, month, and day_of_month
             dailyCounts = obj.issues( ...
-                (obj.issues.year >= max(obj.issues.year) - 1) & ...
+                (obj.issues.year >= max(obj.issues.year) - yearsBack) & ...
                 (obj.issues.is_working_day == workingDayFlag) & ...
                 (ismember(obj.issues.day_of_week, days)),:);
             
@@ -142,9 +142,9 @@ classdef DailyEDA
                 'HorizontalAlignment', 'right', 'VerticalAlignment', 'top', ...
                 'FontSize', 8, 'FontWeight', 'bold', 'Color', 'k');
             plot(dailyCounts.GroupCount,'o')
-            xlabel(['Daily issues trend from ',int2str(min(years)),' to ', int2str(max(years))]);
+            xlabel('Daily issues trend');
             ylabel('Record Count');
-            title(['Issues Trend For: ',  strjoin(days, ', ')]);
+            title(['Issues Trend For: ',  strjoin(days, ', '), ' in Years',strjoin(string(years))]);
             hold off
         end
     end

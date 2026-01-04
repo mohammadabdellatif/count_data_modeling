@@ -54,7 +54,8 @@ classdef PreProcessor
                                 dailySummary.month == month & ...
                                 dailySummary.day_of_month == date)
                             % Calculate the weekday for the given year, month, and day
-                            weekDay = upper(day(datetime(year, month, date), 'shortname'));
+                            dt = datetime(year, month, date);
+                            weekDay = upper(day(dt, 'shortname'));
                             newRecord = table(year, month, date, weekDay, 0, ...
                                 'VariableNames', {'year', 'month', 'day_of_month', 'day_of_week', 'GroupCount'});
                             dailySummary = [dailySummary; newRecord]; % Append the new record
@@ -63,8 +64,10 @@ classdef PreProcessor
                 end
             end
             dailySummary = sortrows(dailySummary, {'year', 'month', 'day_of_month'});
+            dailySummary.dayOfYear = ones(size(dailySummary));
             dailySummary.is_working_day = ~ismember(dailySummary.day_of_week, {'FRI','SAT'});
             issueDates = datetime(dailySummary.year, dailySummary.month, dailySummary.day_of_month);
+            dailySummary.dayOfYear = day(issueDates,"dayofyear");
             dailySummary.is_working_day(ismember(issueDates, holidaysDataSet.Date)) = false;
             dailySummaryOutput = obj.saveDailySummary(dailySummary);
         end
