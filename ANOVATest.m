@@ -11,6 +11,8 @@ classdef ANOVATest
             end
             obj.issues = readtable(preProcessedPath);
             obj.issues = obj.issues(obj.issues.year < max(obj.issues.year), : );
+            disp(min(obj.issues.year))
+            disp(max(obj.issues.year))
         end
 
        function tests = anovaTestForIssuesCountPerDay(obj, yearsBack)

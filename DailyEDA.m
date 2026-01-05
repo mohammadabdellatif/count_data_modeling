@@ -57,7 +57,7 @@ classdef DailyEDA
             hold off;
             xlabel('Year');
             ylabel('Records per Day');
-            title('Daily Record Count Distribution By Year')
+            % title('Daily Record Count Distribution By Year')
         end
 
         function plotHistForYearsBack(obj, yearsBack, isWorkingDay)
@@ -65,29 +65,30 @@ classdef DailyEDA
                 (obj.issues.year >= max(obj.issues.year) - yearsBack) ...
                 & (obj.issues.is_working_day == isWorkingDay), :);
            
-            figure
-            % Update the figure to stretch to fit the two subplots
-            set(gcf, 'Position', [100, 100, 1200, 1000]); % Adjust figure size
+            % figure
+            % % Update the figure to stretch to fit the two subplots
+            % set(gcf, 'Position', [100, 100, 1200, 1000]); % Adjust figure size
             
             x = ['Count per Days ', strjoin(string(unique(G.day_of_week)), ', ')];
             years = strjoin(string(unique(G.year)), ', ');
             
-            subplot(2, 1, 1); % Create a subplot for histfit
-            histfit(G.GroupCount);
+            % subplot(2, 1, 1); % Create a subplot for histfit
+            histogram(G.GroupCount);
             xlabel(x);
             ylabel('Frequencies');
-            title(['Daily Issues Frequencies ', years ]);
+            % title(['Daily Issues Frequencies ', years ]);
             
-            subplot(2, 1, 2); % Create a subplot for normplot
-            normplot(G.GroupCount);
-            xlabel(x);
-            ylabel('Frequencies');
-            title(['Normal Probability Plot', years]);
+            % subplot(2, 1, 2); % Create a subplot for normplot
+            % normplot(G.GroupCount);
+            % xlabel(x);
+            % ylabel('Frequencies');
+            % title(['Normal Probability Plot', years]);
         end
 
         function plotBoxPlotForDaysForYearsBack(obj, yearsBack)
             G = obj.issues( ...
-                (obj.issues.year >= max(obj.issues.year) - yearsBack), :);
+                (obj.issues.year >= max(obj.issues.year) - yearsBack) & ...
+                (obj.issues.is_working_day == 1), :);
            
             week_Days = {'SUN';'MON';'TUE';'WED';'THU';'FRI';'SAT'};
             
@@ -118,7 +119,7 @@ classdef DailyEDA
             hold off;
             xlabel('Day of Week');
             ylabel('Records per Day of Weel');
-            title('Daily Record Count Distribution By Day of Week');
+            % title('Daily Record Count Distribution By Day of Week');
         end
 
         function plotTrendOfIssuesOverTime(obj, days, workingDayFlag, yearsBack)
@@ -144,7 +145,7 @@ classdef DailyEDA
             plot(dailyCounts.GroupCount,'o')
             xlabel('Daily issues trend');
             ylabel('Record Count');
-            title(['Issues Trend For: ',  strjoin(days, ', '), ' in Years',strjoin(string(years))]);
+            % title(['Issues Trend For: ',  strjoin(days, ', '), ' in Years',strjoin(string(years))]);
             hold off
         end
     end

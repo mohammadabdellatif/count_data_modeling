@@ -37,7 +37,7 @@ classdef YearlyEDA
             label = YearlyEDA.labels(fieldName);
             issuesCount = obj.groupByYearAndField(fieldName);
             figure('Name', label + " Count by Year", 'NumberTitle', 'off');
-            plot(issuesCount.year, issuesCount.GroupCount, '-o', 'LineWidth', 1, 'MarkerSize', 4);
+            plot(1:length(issuesCount.year), issuesCount.GroupCount, '-o', 'LineWidth', 1, 'MarkerSize', 4);
             hold on; % Keep the current plot
 
             padded = ylim; % Get current y-axis limits
@@ -45,32 +45,14 @@ classdef YearlyEDA
                 ylim([padded(1), padded(2) + range(padded) * 0.1]); % Add 10% extra space to the top
             end
             
-            % % Add linear fitting line
-            % p = polyfit(issuesCount.year, issuesCount.GroupCount, 1); % Linear fit
-            % yfit = polyval(p, issuesCount.year); % Evaluate the fit
-            % plot(issuesCount.year, yfit, '--r', 'LineWidth', 1); % Plot the fit line
-            % 
-            % % Calculate R-squared value
-            % residuals = issuesCount.GroupCount - yfit; % Calculate residuals
-            % ssRes = sum(residuals.^2); % Residual sum of squares
-            % ssTot = sum((issuesCount.GroupCount - mean(issuesCount.GroupCount)).^2); % Total sum of squares
-            % rSquared = 1 - (ssRes / ssTot); % R-squared calculation
-            % % Add R-squared value to the plot
-            % 
-            % text(issuesCount.year(2), max(issuesCount.GroupCount) * 0.9, ...
-            %     sprintf('R^2 = %.2f', rSquared), ...
-            %     'FontSize', 12, ...
-            %     'Color', 'k', ...
-            %     'HorizontalAlignment', 'center', ...
-            %     'BackgroundColor', 'w');
-
             hold off; % Release the plot hold
 
             xticks(issuesCount.year);
+            xticks(1:height(issuesCount));
             xticklabels(issuesCount.year);
             xlabel('Year');
             ylabel(['Count of ', label]);
-            title(['Count of ', label, ' by Year']);
+            % title(['Count of ', label, ' by Year']);
             grid on;
         end
 
@@ -86,6 +68,18 @@ classdef YearlyEDA
             obj.plotGroupedByYearAndField('product');
         end
 
+        function countryStatistics(obj)
+            disp(['Total number of countries: ', int2str(height(unique(obj.issues.country)))])
+        end
+
+        function productsStatistics(obj)
+            disp(['Total number of products: ', int2str(height(unique(obj.issues.product)))])
+        end
+
+        function clientStatistics(obj)
+            disp(['Total number of clients: ', int2str(height(unique(obj.issues.client_id)))])
+        end
+
         function ratios = scatterPlotTwoFieldsByYear(obj, field1, field2)
             field1ByYear = obj.groupByYearAndField(field1);
             field2ByYear = obj.groupByYearAndField(field2);
@@ -95,33 +89,33 @@ classdef YearlyEDA
             combinedCounts = join(field1ByYear, field2ByYear, 'Keys', 'year');
             figure('Name', [label1, ' Count by ', label2, ' Count'], 'NumberTitle', 'off');
             scatter(combinedCounts, 'GroupCount_field1ByYear', 'GroupCount_field2ByYear')
-            hold on;
+            % hold on;
 
-             % Add linear fitting line
-            p = polyfit(combinedCounts.GroupCount_field1ByYear, ...
-                combinedCounts.GroupCount_field2ByYear, 1); % Linear fit
-            yfit = polyval(p, combinedCounts.GroupCount_field1ByYear); % Evaluate the fit
-            plot(combinedCounts.GroupCount_field1ByYear, yfit, '--r', 'LineWidth', 1); % Plot the fit line
-            
-            % Calculate R-squared value
-            residuals = combinedCounts.GroupCount_field2ByYear - yfit; % Calculate residuals
-            ssRes = sum(residuals.^2); % Residual sum of squares
-            ssTot = sum((combinedCounts.GroupCount_field2ByYear - mean(combinedCounts.GroupCount_field2ByYear)).^2); % Total sum of squares
-            rSquared = 1 - (ssRes / ssTot); % R-squared calculation
-            % Add R-squared value to the plot
-            
-            text(combinedCounts.GroupCount_field1ByYear(2), max(combinedCounts.GroupCount_field2ByYear) * 0.9, ...
-                sprintf('R^2 = %.2f', rSquared), ...
-                'FontSize', 12, ...
-                'Color', 'k', ...
-                'HorizontalAlignment', 'center', ...
-                'BackgroundColor', 'w');
-
-            hold off; % Release the plot hold
+            %  % Add linear fitting line
+            % p = polyfit(combinedCounts.GroupCount_field1ByYear, ...
+            %     combinedCounts.GroupCount_field2ByYear, 1); % Linear fit
+            % yfit = polyval(p, combinedCounts.GroupCount_field1ByYear); % Evaluate the fit
+            % plot(combinedCounts.GroupCount_field1ByYear, yfit, '--r', 'LineWidth', 1); % Plot the fit line
+            % 
+            % % Calculate R-squared value
+            % residuals = combinedCounts.GroupCount_field2ByYear - yfit; % Calculate residuals
+            % ssRes = sum(residuals.^2); % Residual sum of squares
+            % ssTot = sum((combinedCounts.GroupCount_field2ByYear - mean(combinedCounts.GroupCount_field2ByYear)).^2); % Total sum of squares
+            % rSquared = 1 - (ssRes / ssTot); % R-squared calculation
+            % % Add R-squared value to the plot
+            % 
+            % text(combinedCounts.GroupCount_field1ByYear(2), max(combinedCounts.GroupCount_field2ByYear) * 0.9, ...
+            %     sprintf('R^2 = %.2f', rSquared), ...
+            %     'FontSize', 12, ...
+            %     'Color', 'k', ...
+            %     'HorizontalAlignment', 'center', ...
+            %     'BackgroundColor', 'w');
+            % 
+            % hold off; % Release the plot hold
 
             xlabel([label1,' Count']);
             ylabel([label2, ' Count']);
-            title([label1, ' count by ', label2, ' Count']);
+            % title([label1, ' count by ', label2, ' Count']);
             grid on;
         end
 
